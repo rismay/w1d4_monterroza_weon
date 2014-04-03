@@ -23,11 +23,23 @@ class Array
     self.inject(:+)
   end
 
-  #DEEP DUP
   def deep_dup
-
+    self.map do |value_being_copied|
+      if value_being_copied.is_a?Array
+        value_being_copied.deep_dup
+      else
+        value_being_copied
+      end
+    end
   end
+
 end
+
+# a = [1,[2,3,["4",5]],6]
+# b = a.deep_dup
+# p b
+# p a.object_id
+# p b.object_id
 
 # p [1, 2, 3].r_sum #Fix destructive nature of solution
 # p [1, 2, 3].i_sum
@@ -85,14 +97,98 @@ def fibonacci_r(num)
   end
 end
 
-p fibonacci_r(0)
-p fibonacci_r(1)
-p fibonacci_r(6)
-puts ""
+# p fibonacci_r(0)
+# p fibonacci_r(1)
+# p fibonacci_r(6)
+# puts ""
+#
+# p fibonacci_i(0)
+# p fibonacci_i(1)
+# p fibonacci_i(6)
 
-p fibonacci_i(0)
-p fibonacci_i(1)
-p fibonacci_i(6)
+def binary_search(array, target)
+  current_index = array.count/2
+  current_value = array[array.count/2]
 
+  if current_value == target
+    current_index
+  elsif array.size == 1
+    nil
+  elsif target < current_value
+    binary_search(array[0..array.count/2 - 1], target)
+  else
+      new_index = binary_search(array[array.count/2..-1], target)
+    if new_index.nil?     # because final current_value is not the target
+      return nil
+    else
+      current_index += new_index if new_index.nil?
+    end
+  end
+end
 
+# a = [1, 3, 14, 5, 7, 9, 10, 11, 12, 13, 15]
+# puts binary_search(a, 14)
 
+def make_change(amount, coins = [25, 10, 5, 1])
+  coins.each { |coin|
+    if amount % coin == 0
+      [coin] + make_change(amount-coin,coins)
+    else
+      []
+    end
+  }
+end
+
+# p make_change(24)
+# p make_change(39)
+# p make_change(24, [10, 7, 1]) #
+
+def merge_sort(array)
+  if array.length == 1
+    array
+  elsif array.length == 2
+    first, second = array
+    if first > second
+      array[0], array[1] = array[1], array[0]
+    end
+  else
+    merge(merge_sort(array[0..array.count/2]),
+          merge_sort(array[array.count/2+1..-1]))
+  end
+end
+
+def merge(a, b)
+  results = []
+  while (a.count > 0 || b.count > 0)
+    if a.count > 0 && b.count > 0
+      if a.first <= b.first
+        results << a.first
+        a = a.drop(1)
+      else
+        results << b.first
+        b = b.drop(1)
+      end
+    elsif a.count > 0
+      results << a.first
+      a = a.drop(1)
+    else
+      results << b.first
+      b = b.drop(1)
+    end
+  end
+  results
+end
+
+# p merge_sort([1])
+# p merge_sort([2,1])
+# p merge_sort([3,2,1])
+# p merge_sort([4,3,2,1])
+# p merge_sort([3,2,7,4,15,11])
+# p merge_sort([3,2,7,4,15,-11])
+# p merge_sort([3,2,7,4,15,1,11])
+# p merge_sort([3,0,7,4,15,11])
+# p merge_sort([3,0,7,0,15,11])
+# p merge_sort([3,1,4,15,0])
+
+def subsets
+end
