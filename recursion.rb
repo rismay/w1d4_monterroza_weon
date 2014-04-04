@@ -33,7 +33,19 @@ class Array
     end
   end
 
+  def subsets
+    if self.count == 0
+      [[]]
+    else
+      subs = self.take(count - 1).subsets
+      subs + subs.map { |sub| sub + [last] }
+    end
+  end
 end
+#
+# p [].subsets
+# p [1].subsets
+# p [1,2].subsets
 
 # a = [1,[2,3,["4",5]],6]
 # b = a.deep_dup
@@ -130,32 +142,40 @@ end
 # puts binary_search(a, 14)
 
 def make_change(amount, coins = [25, 10, 5, 1])
-  coins.each { |coin|
-    if amount % coin == 0
-      [coin] + make_change(amount-coin,coins)
-    else
-      []
+  coins = coins.sort.reverse
+
+  return [] if coins.empty? || amount < coins.last
+
+  best_change = nil
+
+  coins.each_with_index do |coin, index|
+    next if coin > amount
+
+    remainder = amount - coin
+
+    best_remainder = make_change(remainder, coins[index..-1])
+
+    this_change = [coin] + best_remainder
+
+    if (best_change.nil? || (this_change.count < best_change.count))
+      best_change = this_change
     end
-  }
+  end
+
+  best_change
 end
 
-# p make_change(24)
-# p make_change(39)
-# p make_change(24, [10, 7, 1]) #
+p make_change(24)
+p make_change(39)
+p make_change(14, [10, 7, 1]) #
 
 def merge_sort(array)
-  if array.length == 1
-    array
-  elsif array.length == 2
-    first, second = array
-    if first > second
-      array[0], array[1] = array[1], array[0]
-    end
-  else
-    merge(merge_sort(array[0..array.count/2]),
-          merge_sort(array[array.count/2+1..-1]))
-  end
+  return array if array.length <= 1
+
+  merge(merge_sort(array[0...array.count/2]), #Non inclusive ...
+  merge_sort(array[array.count/2..-1])) #To avoid out of bounds error
 end
+
 
 def merge(a, b)
   results = []
@@ -179,16 +199,13 @@ def merge(a, b)
   results
 end
 
-# p merge_sort([1])
-# p merge_sort([2,1])
-# p merge_sort([3,2,1])
-# p merge_sort([4,3,2,1])
-# p merge_sort([3,2,7,4,15,11])
-# p merge_sort([3,2,7,4,15,-11])
-# p merge_sort([3,2,7,4,15,1,11])
-# p merge_sort([3,0,7,4,15,11])
-# p merge_sort([3,0,7,0,15,11])
-# p merge_sort([3,1,4,15,0])
-
-def subsets
-end
+p merge_sort([1])
+p merge_sort([2,1])
+p merge_sort([3,2,1])
+p merge_sort([4,3,2,1])
+p merge_sort([3,2,7,4,15,11])
+p merge_sort([3,2,7,4,15,-11])
+p merge_sort([3,2,7,4,15,1,11])
+p merge_sort([3,0,7,4,15,11])
+p merge_sort([3,0,7,0,15,11])
+p merge_sort([3,1,4,15,0])
